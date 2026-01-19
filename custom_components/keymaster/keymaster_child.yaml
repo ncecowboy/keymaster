@@ -465,30 +465,82 @@ script:
           entity_id: input_datetime.end_date_LOCKNAME_TEMPLATENUM
         data:
           datetime: "{{ states('input_datetime.end_date_PARENTLOCK_TEMPLATENUM') }}"
-      # Boolean inputs - use repeat for efficiency
-      - repeat:
-          count: 1
-          sequence:
-            - service: >
-                {% if is_state('input_boolean.enabled_PARENTLOCK_TEMPLATENUM', 'on') %}input_boolean.turn_on{% else %}input_boolean.turn_off{% endif %}
-              target:
-                entity_id: input_boolean.enabled_LOCKNAME_TEMPLATENUM
-            - service: >
-                {% if is_state('input_boolean.notify_PARENTLOCK_TEMPLATENUM', 'on') %}input_boolean.turn_on{% else %}input_boolean.turn_off{% endif %}
-              target:
-                entity_id: input_boolean.notify_LOCKNAME_TEMPLATENUM
-            - service: >
-                {% if is_state('input_boolean.reset_codeslot_PARENTLOCK_TEMPLATENUM', 'on') %}input_boolean.turn_on{% else %}input_boolean.turn_off{% endif %}
-              target:
-                entity_id: input_boolean.reset_codeslot_LOCKNAME_TEMPLATENUM
-            - service: >
-                {% if is_state('input_boolean.accesslimit_PARENTLOCK_TEMPLATENUM', 'on') %}input_boolean.turn_on{% else %}input_boolean.turn_off{% endif %}
-              target:
-                entity_id: input_boolean.accesslimit_LOCKNAME_TEMPLATENUM
-            - service: >
-                {% if is_state('input_boolean.daterange_PARENTLOCK_TEMPLATENUM', 'on') %}input_boolean.turn_on{% else %}input_boolean.turn_off{% endif %}
-              target:
-                entity_id: input_boolean.daterange_LOCKNAME_TEMPLATENUM
+      # Boolean inputs - copy all fixed booleans
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ is_state('input_boolean.enabled_PARENTLOCK_TEMPLATENUM', 'on') }}"
+            sequence:
+              - service: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.enabled_LOCKNAME_TEMPLATENUM
+          - conditions:
+              - condition: template
+                value_template: "{{ is_state('input_boolean.enabled_PARENTLOCK_TEMPLATENUM', 'off') }}"
+            sequence:
+              - service: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.enabled_LOCKNAME_TEMPLATENUM
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ is_state('input_boolean.notify_PARENTLOCK_TEMPLATENUM', 'on') }}"
+            sequence:
+              - service: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.notify_LOCKNAME_TEMPLATENUM
+          - conditions:
+              - condition: template
+                value_template: "{{ is_state('input_boolean.notify_PARENTLOCK_TEMPLATENUM', 'off') }}"
+            sequence:
+              - service: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.notify_LOCKNAME_TEMPLATENUM
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ is_state('input_boolean.reset_codeslot_PARENTLOCK_TEMPLATENUM', 'on') }}"
+            sequence:
+              - service: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.reset_codeslot_LOCKNAME_TEMPLATENUM
+          - conditions:
+              - condition: template
+                value_template: "{{ is_state('input_boolean.reset_codeslot_PARENTLOCK_TEMPLATENUM', 'off') }}"
+            sequence:
+              - service: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.reset_codeslot_LOCKNAME_TEMPLATENUM
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ is_state('input_boolean.accesslimit_PARENTLOCK_TEMPLATENUM', 'on') }}"
+            sequence:
+              - service: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.accesslimit_LOCKNAME_TEMPLATENUM
+          - conditions:
+              - condition: template
+                value_template: "{{ is_state('input_boolean.accesslimit_PARENTLOCK_TEMPLATENUM', 'off') }}"
+            sequence:
+              - service: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.accesslimit_LOCKNAME_TEMPLATENUM
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ is_state('input_boolean.daterange_PARENTLOCK_TEMPLATENUM', 'on') }}"
+            sequence:
+              - service: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.daterange_LOCKNAME_TEMPLATENUM
+          - conditions:
+              - condition: template
+                value_template: "{{ is_state('input_boolean.daterange_PARENTLOCK_TEMPLATENUM', 'off') }}"
+            sequence:
+              - service: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.daterange_LOCKNAME_TEMPLATENUM
       # Day-specific inputs using repeat loop for efficiency
       - repeat:
           for_each:
@@ -501,15 +553,37 @@ script:
             - sat
           sequence:
             # Copy day enabled boolean
-            - service: >
-                {% if is_state('input_boolean.' + repeat.item + '_PARENTLOCK_TEMPLATENUM', 'on') %}input_boolean.turn_on{% else %}input_boolean.turn_off{% endif %}
-              target:
-                entity_id: "input_boolean.{{ repeat.item }}_LOCKNAME_TEMPLATENUM"
+            - choose:
+                - conditions:
+                    - condition: template
+                      value_template: "{{ is_state('input_boolean.' + repeat.item + '_PARENTLOCK_TEMPLATENUM', 'on') }}"
+                  sequence:
+                    - service: input_boolean.turn_on
+                      target:
+                        entity_id: "input_boolean.{{ repeat.item }}_LOCKNAME_TEMPLATENUM"
+                - conditions:
+                    - condition: template
+                      value_template: "{{ is_state('input_boolean.' + repeat.item + '_PARENTLOCK_TEMPLATENUM', 'off') }}"
+                  sequence:
+                    - service: input_boolean.turn_off
+                      target:
+                        entity_id: "input_boolean.{{ repeat.item }}_LOCKNAME_TEMPLATENUM"
             # Copy day include/exclude boolean
-            - service: >
-                {% if is_state('input_boolean.' + repeat.item + '_inc_PARENTLOCK_TEMPLATENUM', 'on') %}input_boolean.turn_on{% else %}input_boolean.turn_off{% endif %}
-              target:
-                entity_id: "input_boolean.{{ repeat.item }}_inc_LOCKNAME_TEMPLATENUM"
+            - choose:
+                - conditions:
+                    - condition: template
+                      value_template: "{{ is_state('input_boolean.' + repeat.item + '_inc_PARENTLOCK_TEMPLATENUM', 'on') }}"
+                  sequence:
+                    - service: input_boolean.turn_on
+                      target:
+                        entity_id: "input_boolean.{{ repeat.item }}_inc_LOCKNAME_TEMPLATENUM"
+                - conditions:
+                    - condition: template
+                      value_template: "{{ is_state('input_boolean.' + repeat.item + '_inc_PARENTLOCK_TEMPLATENUM', 'off') }}"
+                  sequence:
+                    - service: input_boolean.turn_off
+                      target:
+                        entity_id: "input_boolean.{{ repeat.item }}_inc_LOCKNAME_TEMPLATENUM"
             # Copy day start time
             - service: input_datetime.set_datetime
               target:
