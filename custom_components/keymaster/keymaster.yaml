@@ -201,14 +201,12 @@ automation:
                   code_slot: >-
                     {{ TEMPLATENUM }}
 
-################  binary_sensor: #################
-binary_sensor:
-  - platform: template
-    sensors:
-      active_LOCKNAME_TEMPLATENUM:
-        friendly_name: "Desired PIN State"
+################  template:  #################
+template:
+  - binary_sensor:
+      - name: "Desired PIN State"
         unique_id: "binary_sensor.active_LOCKNAME_TEMPLATENUM"
-        value_template: >-
+        state: >-
           {## This template checks whether the PIN should be considered active based on ##}
           {## all of the different ways the PIN can be conditionally enabled/disabled ##}
 
@@ -262,10 +260,9 @@ binary_sensor:
             (not is_access_limit_enabled or is_access_count_valid)
           }}
 
-      pin_synched_LOCKNAME_TEMPLATENUM:
-        friendly_name: "PIN synchronized with lock"
+      - name: "PIN synchronized with lock"
         unique_id: "binary_sensor.pin_synched_LOCKNAME_TEMPLATENUM"
-        value_template: >
+        state: >
           {% set lockpin = states('sensor.LOCKNAME_code_slot_TEMPLATENUM').strip()  %}
           {% set localpin = states('input_text.LOCKNAME_pin_TEMPLATENUM').strip()  %}
           {% set pin_active = is_state('binary_sensor.active_LOCKNAME_TEMPLATENUM', 'on')  %}
@@ -278,14 +275,10 @@ binary_sensor:
             {{ lockpin == "" }}
           {% endif %}
 
-###################  sensor:  ####################
-sensor:
-  - platform: template
-    sensors:
-      connected_LOCKNAME_TEMPLATENUM:
-        friendly_name: "PIN Status"
+  - sensor:
+      - name: "PIN Status"
         unique_id: "sensor.connected_LOCKNAME_TEMPLATENUM"
-        value_template: >-
+        state: >-
           {% set pin_active = is_state('binary_sensor.active_LOCKNAME_TEMPLATENUM', 'on')  %}      
           {% set synched = is_state('binary_sensor.pin_synched_LOCKNAME_TEMPLATENUM', 'on')  %}      
           {% if pin_active %}
@@ -301,7 +294,7 @@ sensor:
               Deleting
             {% endif %}
           {% endif %}
-        icon_template: >
+        icon: >
           {% set pin_active = is_state('binary_sensor.active_LOCKNAME_TEMPLATENUM', 'on')  %}      
           {% set synched = is_state('binary_sensor.pin_synched_LOCKNAME_TEMPLATENUM', 'on')  %}      
           {% if pin_active %}
