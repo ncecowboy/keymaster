@@ -67,6 +67,30 @@ The default `packages/keymaster` should suffice.
 
 ## Adding UI to Home Assistant
 
+Keymaster provides two ways to add the UI to Home Assistant:
+
+### Option 1: Using Dashboard Strategy (Recommended)
+
+The easiest way to add the keymaster dashboard is to use the built-in dashboard strategy. This method automatically generates a dashboard view for all your configured locks:
+
+1. Go to **Settings** → **Dashboards**
+2. Click **+ Add Dashboard** or edit an existing dashboard
+3. Click on the three-dot menu (⋮) and select **Edit Dashboard**
+4. Click **+ Add View**
+5. In the view configuration:
+   - Set a **Title** (e.g., "Lock Management")
+   - Set an **Icon** (e.g., `mdi:lock-smart`)
+   - Under **Type**, select **Custom: keymaster**
+   - Click **Save**
+
+The dashboard strategy will automatically detect all your configured keymaster locks and create a complete interface for managing them.
+
+**Note:** The strategy requires the following custom cards to be installed via HACS:
+1. [lovelace-fold-entity-row](https://github.com/thomasloven/lovelace-fold-entity-row)
+2. [numberbox-card](https://github.com/htmltiger/numberbox-card)
+
+### Option 2: Manual YAML Configuration
+
 If all goes well, you will also see a new directory (by default `<your config directory/custom_components/keymaster/lovelace/>`) for each lock with `yaml` and a lovelace files. So if you add two integrations, one with FrontDoor and the other with BackDoor, you should see two directories with those names. Inside of each of those directories will be a file called `<lockname>.yaml`. Open that file in a text editor and select the entire contents and copy to the clipboard.
 
 > (Open file) Ctrl-A (select all) Ctrl-C (copy)
