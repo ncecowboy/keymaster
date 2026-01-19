@@ -104,7 +104,7 @@ SET_USERCODE = "set_usercode"
 CLEAR_USERCODE = "clear_usercode"
 
 
-async def _register_dashboard_strategy(hass: HomeAssistant) -> None:
+def _register_dashboard_strategy(hass: HomeAssistant) -> None:
     """Register the keymaster dashboard strategy frontend resource."""
     # Only register once
     if hass.data.get(DOMAIN, {}).get("_strategy_registered"):
@@ -125,13 +125,10 @@ async def _register_dashboard_strategy(hass: HomeAssistant) -> None:
         
         # Register the static path with Home Assistant's HTTP component
         # This makes the file available at /keymaster/keymaster-dashboard-strategy.js
-        await hass.http.async_register_static_paths(
-            [
-                {
-                    "url": f"/{DOMAIN}/keymaster-dashboard-strategy.js",
-                    "path": strategy_file,
-                }
-            ]
+        hass.http.register_static_path(
+            f"/{DOMAIN}/keymaster-dashboard-strategy.js",
+            strategy_file,
+            cache_headers=True
         )
         
         _LOGGER.info(
@@ -143,6 +140,12 @@ async def _register_dashboard_strategy(hass: HomeAssistant) -> None:
         if DOMAIN in hass.data:
             hass.data[DOMAIN]["_strategy_registered"] = True
             
+    except Exception as err:
+        _LOGGER.warning(
+            "Failed to register dashboard strategy resource: %s. "
+            "Dashboard strategy may not work correctly.",
+            err
+        )
     except Exception as err:
         _LOGGER.warning(
             "Failed to register dashboard strategy resource: %s. "
@@ -310,7 +313,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
     # Register the dashboard strategy frontend resource
-    await _register_dashboard_strategy(hass)
+    _register_dashboard_strategy(hass)
 
     # if the use turned on the bool generate the files
     if should_generate_package:
