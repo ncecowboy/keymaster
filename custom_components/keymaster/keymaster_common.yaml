@@ -339,7 +339,8 @@ automation:
                 state: "on"
             sequence:
               - service: script.turn_on
-                entity_id: script.keymaster_LOCKNAME_start_timer
+                target:
+                  entity_id: script.keymaster_LOCKNAME_start_timer
               - service: input_boolean.turn_off
                 target:
                   entity_id: input_boolean.keymaster_LOCKNAME_retry
@@ -403,7 +404,8 @@ automation:
               - service: timer.cancel
                 entity_id: timer.keymaster_LOCKNAME_autolock
               - service: script.turn_on
-                entity_id: script.keymaster_LOCKNAME_start_timer
+                target:
+                  entity_id: script.keymaster_LOCKNAME_start_timer
           
           # Timer finished - lock the door if autolock is still enabled
           - conditions:
