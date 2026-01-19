@@ -107,31 +107,37 @@ CLEAR_USERCODE = "clear_usercode"
 async def _register_dashboard_strategy(hass: HomeAssistant) -> None:
     """Register the keymaster dashboard strategy frontend resource."""
     # Only register once
-    if hasattr(hass.data.get(DOMAIN, {}), "_strategy_registered"):
+    if hass.data.get(DOMAIN, {}).get("_strategy_registered"):
         return
     
     try:
-        # Register the static path for the dashboard strategy JavaScript file
+        # Get the path to the www directory
         www_path = os.path.join(os.path.dirname(__file__), "www")
+        strategy_file = os.path.join(www_path, "keymaster-dashboard-strategy.js")
         
-        # Register using the lovelace resource system
-        try:
-            await hass.components.lovelace.async_register_resource(
-                url=f"/keymaster/keymaster-dashboard-strategy.js",
-                resource_type="module",
+        # Verify the file exists
+        if not os.path.isfile(strategy_file):
+            _LOGGER.error(
+                "Dashboard strategy file not found at: %s",
+                strategy_file
             )
-            _LOGGER.info("Registered keymaster dashboard strategy frontend resource")
-        except AttributeError:
-            # Fall back to HTTP registration if lovelace.async_register_resource doesn't exist
-            _LOGGER.debug("Using HTTP static path registration for dashboard strategy")
-            await hass.http.async_register_static_paths(
-                [
-                    {
-                        "url": "/keymaster/keymaster-dashboard-strategy.js",
-                        "path": os.path.join(www_path, "keymaster-dashboard-strategy.js"),
-                    }
-                ]
-            )
+            return
+        
+        # Register the static path with Home Assistant's HTTP component
+        # This makes the file available at /keymaster/keymaster-dashboard-strategy.js
+        await hass.http.async_register_static_paths(
+            [
+                {
+                    "url": f"/{DOMAIN}/keymaster-dashboard-strategy.js",
+                    "path": strategy_file,
+                }
+            ]
+        )
+        
+        _LOGGER.info(
+            "Registered keymaster dashboard strategy at /%s/keymaster-dashboard-strategy.js",
+            DOMAIN
+        )
         
         # Mark as registered
         if DOMAIN in hass.data:

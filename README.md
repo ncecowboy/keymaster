@@ -71,22 +71,48 @@ Keymaster provides two ways to add the UI to Home Assistant:
 
 ### Option 1: Using Dashboard Strategy (Recommended)
 
-The easiest way to add the keymaster dashboard is to use the built-in dashboard strategy. This method automatically generates a dashboard view for all your configured locks:
+The easiest way to add the keymaster dashboard is to use the built-in dashboard strategy. This method automatically generates a dashboard view for all your configured locks.
+
+#### Step 1: Add the Dashboard Strategy Resource
+
+First, you need to register the dashboard strategy JavaScript file as a Lovelace resource:
 
 1. Go to **Settings** → **Dashboards**
-2. Click **+ Add Dashboard** or edit an existing dashboard
-3. Click on the three-dot menu (⋮) and select **Edit Dashboard**
-4. Click **+ Add View**
-5. In the view configuration:
-   - Set a **Title** (e.g., "Lock Management")
-   - Set an **Icon** (e.g., `mdi:lock-smart`)
-   - Under **Type**, select **Custom: keymaster**
-   - Click **Save**
+2. Click the three-dot menu (⋮) in the top right
+3. Select **Resources**
+4. Click **+ Add Resource**
+5. Enter the following details:
+   - **URL**: `/keymaster/keymaster-dashboard-strategy.js`
+   - **Resource type**: **JavaScript Module**
+6. Click **Create**
+
+#### Step 2: Create a Dashboard with the Strategy
+
+1. Go to **Settings** → **Dashboards**
+2. Click **+ Add Dashboard**
+3. Enter a title (e.g., "Lock Management")
+4. Enable **Use Dashboard Strategy** (if available in the UI)
+5. In the **Strategy** section, enter:
+   ```yaml
+   strategy:
+     type: custom:keymaster
+   ```
+6. Click **Create**
+
+Alternatively, if editing an existing dashboard in YAML mode, add this to your dashboard configuration:
+
+```yaml
+strategy:
+  type: custom:keymaster
+title: Lock Management
+```
 
 The dashboard strategy will automatically detect all your configured keymaster locks and create a complete interface for managing them.
 
-**Note:** The strategy requires the following custom cards to be installed via HACS:
-1. [lovelace-fold-entity-row](https://github.com/thomasloven/lovelace-fold-entity-row)
+**Required Custom Cards:**
+
+The strategy requires the following custom cards to be installed via HACS:
+1. [fold-entity-row](https://github.com/thomasloven/lovelace-fold-entity-row)
 2. [numberbox-card](https://github.com/htmltiger/numberbox-card)
 
 ### Option 2: Manual YAML Configuration

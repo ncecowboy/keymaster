@@ -2,6 +2,10 @@
  * Keymaster Dashboard Strategy
  * 
  * This strategy automatically generates a dashboard view for keymaster locks.
+ * 
+ * Usage in dashboard YAML:
+ * strategy:
+ *   type: custom:keymaster
  */
 
 class KeymasterDashboardStrategy extends HTMLElement {
