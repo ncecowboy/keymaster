@@ -67,6 +67,56 @@ The default `packages/keymaster` should suffice.
 
 ## Adding UI to Home Assistant
 
+Keymaster provides two ways to add the UI to Home Assistant:
+
+### Option 1: Using Dashboard Strategy (Recommended)
+
+The easiest way to add the keymaster dashboard is to use the built-in dashboard strategy. This method automatically generates a dashboard view for all your configured locks.
+
+#### Step 1: Add the Dashboard Strategy Resource
+
+First, you need to register the dashboard strategy JavaScript file as a Lovelace resource:
+
+1. Go to **Settings** → **Dashboards**
+2. Click the three-dot menu (⋮) in the top right
+3. Select **Resources**
+4. Click **+ Add Resource**
+5. Enter the following details:
+   - **URL**: `/keymaster/keymaster-dashboard-strategy.js`
+   - **Resource type**: **JavaScript Module**
+6. Click **Create**
+
+#### Step 2: Create a Dashboard with the Strategy
+
+1. Go to **Settings** → **Dashboards**
+2. Click **+ Add Dashboard**
+3. Enter a title (e.g., "Lock Management")
+4. Enable **Use Dashboard Strategy** (if available in the UI)
+5. In the **Strategy** section, enter:
+   ```yaml
+   strategy:
+     type: custom:keymaster
+   ```
+6. Click **Create**
+
+Alternatively, if editing an existing dashboard in YAML mode, add this to your dashboard configuration:
+
+```yaml
+strategy:
+  type: custom:keymaster
+title: Lock Management
+```
+
+The dashboard strategy will automatically detect all your configured keymaster locks and create a complete interface for managing them.
+
+**Required Custom Cards:**
+
+The strategy requires the following custom cards to be installed via HACS:
+1. [fold-entity-row](https://github.com/thomasloven/lovelace-fold-entity-row)
+2. [numberbox-card](https://github.com/htmltiger/numberbox-card)
+
+### Option 2: Manual YAML Configuration
+
 If all goes well, you will also see a new directory (by default `<your config directory/custom_components/keymaster/lovelace/>`) for each lock with `yaml` and a lovelace files. So if you add two integrations, one with FrontDoor and the other with BackDoor, you should see two directories with those names. Inside of each of those directories will be a file called `<lockname>.yaml`. Open that file in a text editor and select the entire contents and copy to the clipboard.
 
 > (Open file) Ctrl-A (select all) Ctrl-C (copy)

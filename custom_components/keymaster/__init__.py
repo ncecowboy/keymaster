@@ -4,6 +4,7 @@ import asyncio
 from datetime import timedelta
 import functools
 import logging
+import os
 from typing import Any, Dict, List, Optional, Union
 
 import voluptuous as vol
@@ -103,6 +104,56 @@ SET_USERCODE = "set_usercode"
 CLEAR_USERCODE = "clear_usercode"
 
 
+def _register_dashboard_strategy(hass: HomeAssistant) -> None:
+    """Register the keymaster dashboard strategy frontend resource."""
+    # Only register once
+    if hass.data.get(DOMAIN, {}).get("_strategy_registered"):
+        return
+    
+    try:
+        # Get the path to the www directory
+        www_path = os.path.join(os.path.dirname(__file__), "www")
+        strategy_file = os.path.join(www_path, "keymaster-dashboard-strategy.js")
+        
+        # Verify the file exists
+        if not os.path.isfile(strategy_file):
+            _LOGGER.error(
+                "Dashboard strategy file not found at: %s",
+                strategy_file
+            )
+            return
+        
+        # Register the static path with Home Assistant's HTTP component
+        # This makes the file available at /keymaster/keymaster-dashboard-strategy.js
+        hass.http.register_static_path(
+            f"/{DOMAIN}/keymaster-dashboard-strategy.js",
+            strategy_file,
+            cache_headers=True
+        )
+        
+        _LOGGER.info(
+            "Registered keymaster dashboard strategy at /%s/keymaster-dashboard-strategy.js",
+            DOMAIN
+        )
+        
+        # Mark as registered
+        if DOMAIN in hass.data:
+            hass.data[DOMAIN]["_strategy_registered"] = True
+            
+    except Exception as err:
+        _LOGGER.warning(
+            "Failed to register dashboard strategy resource: %s. "
+            "Dashboard strategy may not work correctly.",
+            err
+        )
+    except Exception as err:
+        _LOGGER.warning(
+            "Failed to register dashboard strategy resource: %s. "
+            "Dashboard strategy may not work correctly.",
+            err
+        )
+
+
 async def homeassistant_started_listener(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -123,7 +174,10 @@ async def homeassistant_started_listener(
 async def async_setup(  # pylint: disable-next=unused-argument
     hass: HomeAssistant, config: ConfigType
 ) -> bool:
-    """Disallow configuration via YAML."""
+    """Set up the keymaster component."""
+    # Register dashboard strategy as a Lovelace resource
+    # This needs to be done during setup to make the strategy available
+    hass.data.setdefault(DOMAIN, {})
     return True
 
 
@@ -257,6 +311,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     )
 
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
+
+    # Register the dashboard strategy frontend resource
+    _register_dashboard_strategy(hass)
 
     # if the use turned on the bool generate the files
     if should_generate_package:
