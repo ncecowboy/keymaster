@@ -14,12 +14,12 @@
     "zwave",
     "zwave_js"
   ],
-  "codeowners": ["@FutureTense", "@firstof9", "@raman325"],  
+  "codeowners": ["@FutureTense", "@firstof9", "@raman325","@ncecowboy"],  
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/FutureTense/keymaster",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/FutureTense/keymaster/issues",
   "requirements": [],
-  "version": "v0.0.0"
+  "version": "v0.2.2"
 }
