@@ -93,15 +93,11 @@ class KeyMasterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(config_entry: config_entries.ConfigEntry):
-        return KeyMasterOptionsFlow(config_entry)
+        return KeyMasterOptionsFlow()
 
 
 class KeyMasterOptionsFlow(config_entries.OptionsFlow):
     """Options flow for KeyMaster."""
-
-    def __init__(self, config_entry: config_entries.ConfigEntry):
-        """Initialize."""
-        self.config_entry = config_entry
 
     def _get_unique_name_error(self, user_input):
         """Check if name is unique, returning dictionary error if so."""

@@ -146,12 +146,6 @@ def _register_dashboard_strategy(hass: HomeAssistant) -> None:
             "Dashboard strategy may not work correctly.",
             err
         )
-    except Exception as err:
-        _LOGGER.warning(
-            "Failed to register dashboard strategy resource: %s. "
-            "Dashboard strategy may not work correctly.",
-            err
-        )
 
 
 async def homeassistant_started_listener(
@@ -391,14 +385,7 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
         notification_id=notification_id,
     )
 
-    unload_ok = all(
-        await asyncio.gather(
-            *[
-                hass.config_entries.async_forward_entry_unload(config_entry, platform)
-                for platform in PLATFORMS
-            ]
-        )
-    )
+    unload_ok = await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)
 
     if unload_ok:
         # Remove all package files and the base folder if needed
@@ -440,8 +427,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
             data[CONF_HIDE_PINS] = DEFAULT_HIDE_PINS
         data[CONF_CHILD_LOCKS_FILE] = data.get(CONF_CHILD_LOCKS_FILE, "")
 
-        hass.config_entries.async_update_entry(entry=config_entry, data=data)
-        config_entry.version = 2
+        hass.config_entries.async_update_entry(entry=config_entry, data=data, version=2)
         _LOGGER.debug("Migration to version %s complete", config_entry.version)
 
     return True
